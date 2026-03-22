@@ -1,78 +1,59 @@
-# 📉 Customer Churn Prediction Pipeline
+# Churn Risk Analysis Pipeline
 
-A end-to-end machine learning project to analyze and predict customer churn using exploratory data analysis (EDA) and classification models.
+An agentic AI system that detects customer churn risk in real time,
+matches against historical patterns, and generates actionable retention plans.
 
----
+## What This System Does
 
-## 📌 Project Overview
+Reads a customer email or support ticket and automatically:
+1. Detects warning signals in the message
+2. Finds similar historical cases from 440,833 customer records
+3. Generates a personalised retention action plan
 
-Customer churn refers to when a customer stops doing business with a company. This project aims to:
+## The Three Agents
 
-- Perform in-depth **Exploratory Data Analysis (EDA)** to understand churn patterns
-- Build and evaluate **Machine Learning models** to predict which customers are likely to churn
-- Provide actionable insights to help reduce churn rates
+| Agent | Name | Job |
+|-------|------|-----|
+| Agent 1 | Multi-Channel Analyser | Reads customer messages and spots risk signals |
+| Agent 2 | Experience Curator | Finds similar past customers using vector search |
+| Agent 3 | Playbook Creator | Generates retention action plans using an LLM |
 
----
+## Dataset
 
-## 📂 Project Structure
+440,833 customer records with features:
+Age, Gender, Tenure, Usage Frequency, Support Calls,
+Payment Delay, Subscription Type, Contract Length,
+Total Spend, Last Interaction, Churn
 
-```
-churn-pipeline/
-│
-├── data/
-│   └── raw/                  # Raw dataset (not tracked by Git)
-│
-├── notebooks/                # Jupyter notebooks for EDA and modeling
-│
-├── src/                      # Python scripts and modules
-│
-├── models/                   # Saved trained models
-│
-├── outputs/                  # Plots, reports, results
-│
-├── .env                      # Environment variables (never committed)
-├── .gitignore                # Files ignored by Git
-├── requirements.txt          # Python dependencies
-└── README.md                 # Project documentation
-```
+## Validated Signal Thresholds
 
----
+| Signal | Threshold | Detection Rate | Weight |
+|--------|-----------|---------------|--------|
+| Support Calls | >= 4 | 65.9% | 0.35 |
+| Total Spend | <= 600 | 57.2% | 0.25 |
+| Payment Delay | >= 17 days | 46.2% | 0.20 |
+| Last Interaction | >= 15 days | 54.0% | 0.15 |
+| Usage Frequency | < 14 days/month | weak | 0.05 |
 
-## 📊 Dataset
+## Build Progress
 
-- **Source:** [Kaggle - Customer Churn Dataset](https://www.kaggle.com/)
-- **Format:** CSV
-- **Description:** Contains customer demographics, account information, and service usage data with a churn label indicating whether the customer left.
+- [x] Phase 1 -- Data exploration and signal threshold validation
+- [x] Phase 2 -- Simulated customer email generation
+- [ ] Phase 3 -- Agent 1: Multi-Channel Analyser
+- [ ] Phase 4 -- Agent 2: Experience Curator
+- [ ] Phase 5 -- Agent 3: Playbook Creator
+- [ ] Phase 6 -- Orchestration: wire all agents together
+- [ ] Phase 7 -- Feedback loop: continuous learning
+- [ ] Phase 8 -- Production: API, Docker, CI/CD
 
-> ⚠️ The raw dataset is not committed to this repository due to its size. Download it from the source above and place it in `data/raw/`.
+## Tech Stack
 
----
+- Python 3.10+
+- pandas -- data manipulation
+- OpenRouter API -- LLM access (Claude 3 Haiku)
+- ChromaDB -- vector database (Phase 4)
+- FastAPI -- production API (Phase 8)
 
+## Author
 
-## 🚧 Project Status
-
-> **Currently in progress** — EDA and data preprocessing phase.
-
-| Phase | Status |
-|---|---|
-| Data Collection | ✅ Done |
-| Exploratory Data Analysis | 🔄 In Progress |
-| Data Preprocessing | ⏳ Upcoming |
-| Model Building | ⏳ Upcoming |
-| Model Evaluation | ⏳ Upcoming |
-| Deployment | ⏳ Upcoming |
-
----
-
-## 🛠️ Tech Stack
-
-- **Language:** Python
-- **Libraries:** Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn
-- **Environment:** Jupyter Notebook
-- **Version Control:** Git & GitHub
-
----
-## 👤 Author
-
-**Shashwat Sharma**
-- GitHub: [@shashwatsharma076-create](https://github.com/shashwatsharma076-create)
+Built from scratch as a learning project in agentic AI engineering.
