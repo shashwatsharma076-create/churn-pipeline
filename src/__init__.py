@@ -33,8 +33,9 @@ from src.config import (
     ensure_directories,
     get_project_root,
 )
+from src.pipeline import UnifiedChurnPipeline
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 __all__ = [
     "BaseAgent",
@@ -47,6 +48,7 @@ __all__ = [
     "RiskAssessment",
     "RetentionAction",
     "PipelineResult",
+    "UnifiedChurnPipeline",
     "load_raw_data",
     "clean_data",
     "load_or_create_clean_data",
