@@ -1,6 +1,6 @@
 # Customer Churn Prediction Pipeline
 
-An end-to-end customer churn analysis pipeline using **Agentic AI** - featuring specialized AI agents that collaborate to detect churn signals, assess risk, and recommend retention actions.
+An end-to-end customer churn analysis pipeline using **Agentic AI** - featuring specialized AI agents that collaborate to detect churn signals, assess risk, and recommend retention actions.....
 
 ## Architecture
 
