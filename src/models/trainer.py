@@ -53,6 +53,12 @@ class ChurnModelTrainer:
             self.load_data()
 
         df = self.df.copy()
+        
+        original_rows = len(df)
+        df = df.dropna()
+        dropped_rows = original_rows - len(df)
+        if dropped_rows > 0:
+            print(f"Dropped {dropped_rows} rows with missing values")
 
         categorical_cols = ["Gender", "Subscription Type", "Contract Length"]
         for col in categorical_cols:

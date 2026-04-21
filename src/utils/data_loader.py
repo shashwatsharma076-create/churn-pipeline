@@ -45,8 +45,10 @@ def load_or_create_clean_data() -> pd.DataFrame:
     clean_path = PATHS["clean_data"]
 
     if clean_path.exists():
-        return pd.read_csv(clean_path)
-
+        df = pd.read_csv(clean_path)
+        if df.isnull().sum().sum() > 0:
+            print("Existing clean data has NaN, re-creating...")
+    
     raw_path = PATHS["raw_data"]
     if not raw_path.exists():
         raise FileNotFoundError(f"Raw data not found at {raw_path}")
