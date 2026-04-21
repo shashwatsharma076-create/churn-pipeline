@@ -8,6 +8,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+# Create directories
+from src.config import ensure_directories
+ensure_directories()
+
 print("=" * 70)
 print("CUSTOMER CHURN PIPELINE - FULL RUN")
 print("=" * 70)
