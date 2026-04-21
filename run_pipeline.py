@@ -6,11 +6,14 @@ import sys
 import os
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
+# Get project root
+PROJECT_ROOT = Path(__file__).parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
-# Create directories
-from src.config import ensure_directories
-ensure_directories()
+# Ensure directories exist
+(PROJECT_ROOT / "data" / "processed").mkdir(parents=True, exist_ok=True)
+(PROJECT_ROOT / "models").mkdir(parents=True, exist_ok=True)
+(PROJECT_ROOT / "outputs").mkdir(parents=True, exist_ok=True)
 
 print("=" * 70)
 print("CUSTOMER CHURN PIPELINE - FULL RUN")
@@ -36,7 +39,7 @@ print("\n[STEP 2] Training ML Model...")
 print("-" * 50)
 
 df_sample = df.sample(10000, random_state=42)
-sample_path = Path('data/processed/train_sample.csv')
+sample_path = PROJECT_ROOT / 'data' / 'processed' / 'train_sample.csv'
 df_sample.to_csv(sample_path, index=False)
 
 from src.models import ChurnModelTrainer
