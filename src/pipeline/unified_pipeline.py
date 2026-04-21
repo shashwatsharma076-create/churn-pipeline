@@ -48,7 +48,10 @@ class UnifiedChurnPipeline:
         for i in range(0, len(df), batch_size):
             batch = df.iloc[i:i+batch_size]
             batch_results = self.predictor.predict_batch(batch)
-            probabilities.extend(batch_results["churn_probability"].tolist())
+            probs = batch_results["churn_probability"]
+            if hasattr(probs, 'tolist'):
+                probs = probs.tolist()
+            probabilities.extend(probs)
 
         results["ml_churn_probability"] = probabilities
         return results

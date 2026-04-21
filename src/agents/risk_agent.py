@@ -52,13 +52,16 @@ class RiskAgent(BaseAgent):
         elif customer_data and customer_data.get("Contract Length") == "Quarterly":
             churn_prob *= 0.85
 
+        if hasattr(churn_prob, 'item'):
+            churn_prob = float(churn_prob)
+
         return RiskAssessment(
             customer_id=customer_id,
             risk_level=risk_level,
             risk_score=risk_score,
             signal_count=len(signals),
             signals=signals,
-            churn_probability=round(churn_prob, 3),
+            churn_probability=round(float(churn_prob), 3),
         )
 
     def get_risk_explanation(self, assessment: RiskAssessment) -> str:
