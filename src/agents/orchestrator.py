@@ -26,13 +26,20 @@ class OrchestratorAgent(BaseAgent):
         self,
         df: pd.DataFrame,
         sample_size: Optional[int] = None,
-        use_llm_enhancement: bool = False
+        use_llm_enhancement: bool = False,
+        use_ml: bool = False,
+        ml_model=None
     ) -> PipelineResult:
         """Run the full churn analysis pipeline."""
         start_time = time.time()
 
         if sample_size:
             df = df.head(sample_size)
+
+        ml_probs = None
+        if use_ml and ml_model is not None:
+            print("Loading ML predictions...")
+            ml_probs = ml_model.predict_batch(df)["churn_probability"].tolist()
 
         print(f"Processing {len(df)} customers...")
         assessments = []
@@ -43,6 +50,12 @@ class OrchestratorAgent(BaseAgent):
 
             signals = self.signal_agent.run(row)
             assessment = self.risk_agent.run(cust_id, signals, row.to_dict())
+
+            if use_ml and ml_probs is not None:
+                ml_prob = ml_probs[idx] if idx < len(ml_probs) else 0.5
+                agent_prob = assessment.churn_probability or 0.0
+                combined = (float(ml_prob) + float(agent_prob)) / 2
+                assessment.churn_probability = round(float(combined), 3)
 
             if use_llm_enhancement and assessment.signal_count > 0:
                 try:
