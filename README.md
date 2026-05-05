@@ -166,9 +166,87 @@ python main.py summary
 - **LLM Enhancement**: Uses AI for deeper semantic analysis
 - **ML Integration**: Optional machine learning predictions
 - **Unified Pipeline**: Combines ML + AI agents
+- **Interactive UI**: Streamlit dashboard with visualizations, CSV upload, and real-time predictions
+
+## Interactive UI (Streamlit)
+
+The project includes a beautiful, interactive web dashboard built with Streamlit and Plotly.
+
+### Features
+- **📊 Dashboard**: Dataset overview with interactive charts (pie, histogram, box plots, correlation heatmap)
+- **👤 Single Customer**: Real-time churn prediction with risk gauge and AI recommendations
+- **📦 Batch Analysis**: Analyze thousands of customers at once with risk distribution charts
+- **🤖 ML Model**: Train models and make predictions with confidence gauges
+- **📁 Upload CSV**: Upload your own dataset with auto-detection and template download
+- **📥 Export**: Download analysis results as CSV
+
+### Screenshots
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    📉 Customer Churn Analyzer                           │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  [📊 Dashboard]  [👤 Single Customer]  [📦 Batch Analysis]           │
+│  [🤖 ML Model]  [📁 Upload CSV]                                        │
+│                                                                          │
+│  ──────────────────────────────────────────────────────────────────────  │
+│                                                                          │
+│  📊 DATASET OVERVIEW                                                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐              │
+│  │Total:    │  │Churned:  │  │Rate:     │  │Avg:      │              │
+│  │440,832   │  │250,000  │  │56.7%     │  │24 mo     │              │
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘              │
+│                                                                          │
+│  [Churn Pie Chart]              [Age Distribution Histogram]             │
+│                                                                          │
+│  [Feature Correlation Heatmap]                                           │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Run the UI
+
+```bash
+# Install dependencies (including UI packages)
+pip install -r requirements.txt
+
+# Launch the dashboard
+streamlit run streamlit_app.py
+```
+
+The app will open automatically at `http://localhost:8501`
+
+### UI Pages
+
+| Page | Description |
+|------|-------------|
+| **📊 Dashboard** | Overview of dataset with interactive Plotly charts |
+| **👤 Single Customer** | Enter customer details, get AI risk assessment + recommendations |
+| **📦 Batch Analysis** | Analyze up to 10,000 customers with risk distribution |
+| **🤖 ML Model** | Train models (LR, RF, GB) and make predictions |
+| **📁 Upload CSV** | Upload custom datasets with auto-column mapping |
 
 ## Project Structure
 
+```
+churn-pipeline/
+├── streamlit_app.py   # Interactive Streamlit UI
+├── src/
+│   ├── agents/          # AI agents (signal, risk, action, orchestrator)
+│   ├── models/          # ML models (trainer, predictor)
+│   ├── pipeline/       # Unified pipeline
+│   ├── schemas/        # Data models and types
+│   ├── utils/         # Utilities (data loading, output formatting)
+│   └── config.py      # Configuration and thresholds
+├── data/
+│   ├── raw/           # Raw customer data
+│   ├── processed/     # Cleaned data
+│   └── simulated/     # Generated content
+├── outputs/           # Analysis results
+├── tests/             # Unit tests
+├── main.py            # CLI entry point
+└── requirements.txt
 ```
 churn-pipeline/
 ├── src/
