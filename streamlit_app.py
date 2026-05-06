@@ -16,7 +16,7 @@ PROJECT_ROOT = Path(__file__).parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.config import ensure_directories, PATHS
-from src.utils import load_or_create_clean_data, get_data_summary
+from src.utils import load_or_create_clean_data, get_data_summary, EmailGenerator
 from src.agents import OrchestratorAgent
 from src.models import ChurnModelTrainer, ChurnPredictor
 
@@ -50,7 +50,7 @@ with st.sidebar:
     # Mode selection
     page = st.radio(
         "Navigation",
-        ["📊 Dashboard", "👤 Single Customer", "📦 Batch Analysis", "🤖 ML Model", "📁 Upload CSV"],
+        ["📊 Dashboard", "👤 Single Customer", "📦 Batch Analysis", "🤖 ML Model", "📁 Upload CSV", "📧 Email Campaign"],
         label_visibility="collapsed"
     )
     
@@ -565,6 +565,169 @@ elif page == "📁 Upload CSV":
             file_name="churn_template.csv",
             mime="text/csv"
         )
+
+# ============================================================
+# PAGE 6: EMAIL CAMPAIGN
+# ============================================================
+elif page == "📧 Email Campaign":
+    st.title("📧 Email Campaign")
+    st.markdown("Generate and send retention emails to at-risk customers")
+    
+    # Initialize email generator
+    use_llm = st.sidebar.checkbox("Use LLM for email generation (requires API key)", value=False)
+    email_gen = EmailGenerator(use_llm=use_llm)
+    
+    # Filters
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        risk_filter = st.selectbox("Risk Level", ["Critical & High", "Critical Only", "High Only", "All"])
+    with col2:
+        sample_size = st.number_input("Sample Size", 10, 1000, 100)
+    with col3:
+        if st.button("🔄 Load At-Risk Customers", type="primary"):
+            with st.spinner("Analyzing customers..."):
+                df = load_data()
+                df_sample = df.head(sample_size)
+                
+                orch = get_orchestrator()
+                result = orch.run(df_sample, sample_size=sample_size, use_llm_enhancement=False)
+                
+                # Filter by risk level
+                filtered_results = []
+                for r in result.results:
+                    if risk_filter == "Critical Only" and r.risk_level.lower() != "critical":
+                        continue
+                    elif risk_filter == "High Only" and r.risk_level.lower() != "high":
+                        continue
+                    elif risk_filter == "Critical & High" and r.risk_level.lower() not in ["critical", "high"]:
+                        continue
+                    filtered_results.append(r)
+                
+                # Store in session state
+                st.session_state.email_customers = filtered_results
+                st.session_state.email_df = df_sample
+                st.success(f"Loaded {len(filtered_results)} at-risk customers")
+    
+    # Display customers
+    if "email_customers" in st.session_state and st.session_state.email_customers:
+        st.markdown("---")
+        st.subheader("📧 Select Customers for Email Campaign")
+        
+        customers = st.session_state.email_customers
+        df_sample = st.session_state.email_df
+        
+        # Store selected customers
+        selected_indices = []
+        
+        for i, r in enumerate(customers):
+            col1, col2, col3, col4, col5 = st.columns([1, 2, 2, 3, 2])
+            
+            with col1:
+                if st.checkbox("Select", key=f"select_{i}"):
+                    selected_indices.append(i)
+            
+            with col2:
+                st.write(f"**Customer #{r.customer_id}**")
+                st.write(f"Risk: {r.risk_level.upper()}")
+            
+            with col3:
+                st.write(f"Score: {r.risk_score}/100")
+                st.write(f"Churn: {r.churn_probability:.1%}")
+            
+            with col4:
+                signals_desc = "; ".join([sig.description for sig in r.signals[:2]]) if r.signals else "None"
+                st.write(f"Signals: {signals_desc}")
+            
+            with col5:
+                if st.button("📧 Generate", key=f"gen_{i}"):
+                    customer_data = df_sample[df_sample.index == i].to_dict('records')[0] if i < len(df_sample) else {}
+                    email_data = email_gen.generate_email(customer_data, r, r.signals)
+                    
+                    st.session_state[f"email_subject_{i}"] = email_data["subject"]
+                    st.session_state[f"email_body_{i}"] = email_data["body"]
+                    st.session_state[f"email_generated_{i}"] = True
+            
+            # Show generated email
+            if st.session_state.get(f"email_generated_{i}", False):
+                with st.expander("📧 Email Preview", expanded=True):
+                    subject = st.text_input("Subject", st.session_state[f"email_subject_{i}"], key=f"subj_edit_{i}")
+                    body = st.text_area("Body", st.session_state[f"email_body_{i}"], height=200, key=f"body_edit_{i}")
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if st.button("📧 Send Email", key=f"send_{i}"):
+                            # Simulate sending (or actually send if SMTP configured)
+                            st.success(f"✅ Email would be sent to customer #{r.customer_id}")
+                            st.info("Note: Configure SMTP in .env to send real emails")
+                    
+                    with col2:
+                        email_data = {
+                            "customer_id": r.customer_id,
+                            "risk_level": r.risk_level.upper(),
+                            "subject": subject,
+                            "body": body
+                        }
+                        email_df = pd.DataFrame([email_data])
+                        csv = email_df.to_csv(index=False)
+                        st.download_button(
+                            label="📥 Download Email",
+                            data=csv,
+                            file_name=f"email_customer_{r.customer_id}.csv",
+                            mime="text/csv",
+                            key=f"dl_{i}"
+                        )
+            
+            st.markdown("---")
+        
+        # Bulk actions
+        st.markdown("---")
+        st.subheader("Bulk Actions")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            if st.button("📧 Generate All Emails", type="primary"):
+                if not selected_indices:
+                    st.warning("Please select customers first")
+                else:
+                    with st.spinner("Generating emails..."):
+                        email_results = []
+                        for i in selected_indices:
+                            r = customers[i]
+                            customer_data = df_sample.iloc[i].to_dict() if i < len(df_sample) else {}
+                            email_data = email_gen.generate_email(customer_data, r, r.signals)
+                            email_results.append({
+                                "customer_id": r.customer_id,
+                                "email": f"customer_{r.customer_id}@example.com",
+                                "risk_level": r.risk_level.upper(),
+                                "risk_score": r.risk_score,
+                                "subject": email_data["subject"],
+                                "body": email_data["body"],
+                                "status": "Generated"
+                            })
+                        
+                        st.session_state.bulk_emails = email_results
+                        st.success(f"Generated {len(email_results)} emails")
+        
+        with col2:
+            if st.button("📧 Send All Emails"):
+                if "bulk_emails" not in st.session_state:
+                    st.warning("Generate emails first")
+                else:
+                    st.info("Bulk send: Configure SMTP in .env to send real emails")
+                    for email_data in st.session_state.bulk_emails:
+                        st.success(f"✅ Would send to Customer #{email_data['customer_id']}")
+        
+        with col3:
+            if "bulk_emails" in st.session_state:
+                email_df = pd.DataFrame(st.session_state.bulk_emails)
+                csv = email_df.to_csv(index=False)
+                st.download_button(
+                    label="📥 Download All Emails (CSV)",
+                    data=csv,
+                    file_name="retention_emails.csv",
+                    mime="text/csv"
+                )
 
 # Footer
 st.markdown("---")
