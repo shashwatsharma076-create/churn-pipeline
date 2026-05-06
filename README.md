@@ -167,6 +167,7 @@ python main.py summary
 - **ML Integration**: Optional machine learning predictions
 - **Unified Pipeline**: Combines ML + AI agents
 - **Interactive UI**: Streamlit dashboard with visualizations, CSV upload, and real-time predictions
+- **Email Campaign**: Generate and send personalized retention emails to at-risk customers (template or LLM-powered)
 
 ## Interactive UI (Streamlit)
 
@@ -178,7 +179,8 @@ The project includes a beautiful, interactive web dashboard built with Streamlit
 - **📦 Batch Analysis**: Analyze thousands of customers at once with risk distribution charts
 - **🤖 ML Model**: Train models and make predictions with confidence gauges
 - **📁 Upload CSV**: Upload your own dataset with auto-detection and template download
-- **📥 Export**: Download analysis results as CSV
+- **📧 Email Campaign**: Generate and send personalized retention emails to at-risk customers
+- **📥 Export**: Download analysis results as CSV (including emails)
 
 ### Screenshots
 
@@ -302,6 +304,44 @@ pytest tests/ -v
 # Run specific test file
 pytest tests/test_signal_agent.py -v
 ```
+
+## Email Campaign Feature
+
+Generate and send personalized retention emails to at-risk customers.
+
+### How It Works
+
+1. **Load At-Risk Customers**: Filter by Critical/High risk levels
+2. **Generate Emails**: Choose template-based or LLM-powered generation
+3. **Preview & Edit**: Review emails in the UI before sending
+4. **Send or Export**: Send via SMTP (if configured) or download as CSV
+
+### Email Generation Methods
+
+| Method | Description |
+|--------|-------------|
+| **Template** | Pre-written templates for each risk level (Critical, High, Medium, Low) with customer variables |
+| **LLM-Powered** | Uses OpenRouter API with Anthropic Claude 3 Haiku for personalized emails |
+
+### SMTP Configuration (Optional)
+
+To send real emails, configure `.env`:
+```bash
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+```
+
+**Note**: If SMTP is not configured, the app simulates sending and allows CSV export for manual sending.
+
+### Files Added
+
+| File | Purpose |
+|------|---------|
+| `src/utils/email_templates.py` | Email templates and LLM prompts |
+| `src/utils/email_generator.py` | EmailGenerator class for generating and sending emails |
+| `streamlit_app.py` (Email Campaign page) | UI for managing email campaigns |
 
 ## Tech Stack
 
