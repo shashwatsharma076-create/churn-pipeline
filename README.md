@@ -1,5 +1,18 @@
 # Customer Churn Prediction Pipeline
 
+[![GitHub](https://img.shields.io/badge/GitHub-Repo-blue?logo=github)](https://github.com/shashwatsharma076-create/churn-pipeline)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://churn-pipeline.streamlit.app)
+[![Python](https://img.shields.io/badge/Python-3.8%2B-green?logo=python)](https://python.org)
+[![F1 Score](https://img.shields.io/badge/F1%20Score-99.73%25-success)]()
+
+### 🌐 Live Demo
+
+> **Deployed at: [https://churn-pipeline.streamlit.app](https://churn-pipeline.streamlit.app)**
+>
+> *Click the badge above or the link to open the live app*
+
+---
+
 An end-to-end customer churn analysis pipeline using **Agentic AI** - featuring specialized AI agents that collaborate to detect churn signals, assess risk, and recommend retention actions.....
 
 ## Architecture
@@ -218,6 +231,20 @@ streamlit run streamlit_app.py
 ```
 
 The app will open automatically at `http://localhost:8501`
+
+### 🌐 Deploy to Streamlit Cloud (Free)
+
+Get a live URL that anyone can access:
+
+1. Go to **[share.streamlit.io](https://share.streamlit.io)**
+2. Sign in with your GitHub account
+3. Click **"New app"**
+4. Select: **`shashwatsharma076-create/churn-pipeline`** repo
+5. Branch: **`main`**
+6. Main file: **`streamlit_app.py`**
+7. Click **"Deploy"** ⚡
+
+Your app will be live at: `https://churn-pipeline.streamlit.app`
 
 ### UI Pages
 
