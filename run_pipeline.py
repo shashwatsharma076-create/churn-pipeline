@@ -38,14 +38,13 @@ print("Retained:", summary['total_rows'] - int(summary['churn_count']))
 print("\n[STEP 2] Training ML Model...")
 print("-" * 50)
 
-df_sample = df.sample(10000, random_state=42)
-sample_path = PROJECT_ROOT / 'data' / 'processed' / 'train_sample.csv'
-df_sample.to_csv(sample_path, index=False)
+train_path = PROJECT_ROOT / 'data' / 'processed' / 'train_data.csv'
+df.to_csv(train_path, index=False)
 
 from src.models import ChurnModelTrainer
 from src.config import PATHS
 
-trainer = ChurnModelTrainer(data_path=sample_path, models_dir=PATHS['models'])
+trainer = ChurnModelTrainer(data_path=train_path, models_dir=PATHS['models'])
 trainer.preprocess()
 trainer.train_models()
 trainer.select_best_model()
@@ -53,7 +52,7 @@ trainer.select_best_model()
 model_path = trainer.save_model('best_model.pkl')
 print("Model saved:", model_path)
 
-os.remove(sample_path)
+os.remove(train_path)
 
 
 # STEP 3: RUN AI AGENT ANALYSIS
